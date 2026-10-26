@@ -1,48 +1,40 @@
-# Analysis scripts and external inputs
+# Analysis
 
-The Python scripts in this directory are included as source code. Their required data, saved predictions, and computed outputs are not bundled.
+All input data and generated outputs are supplied separately from this repository.
 
-## Expected external archive layout
+## Scripts
 
-The separately supplied results archive must provide:
+| Script | Input | Output |
+| --- | --- | --- |
+| `make_descriptive_stats.py` | Prepared return CSV files | Descriptive-statistics table |
+| `make_tables.py` | Aligned forecast aggregates and robustness summaries | Forecast metrics, statistical tests, and robustness tables |
+| `make_supplementary_tables.py` | Per-origin forecast files | Selected configurations, tuning-budget comparisons, and seed comparisons |
+| `make_figures.py` | Forecast aggregates and rolling series | Figures 1--6 |
 
-- `predictions/final/ASSET/MODEL_predictions.csv` for baseline forecasts.
-- `predictions/seed7/ASSET/MODEL_predictions.csv` and `predictions/seed2024/ASSET/MODEL_predictions.csv` for seed comparisons.
-- `predictions/budget60/ASSET/MODEL_predictions.csv` for budget comparisons on the assets used in that experiment.
-- `predictions/analysis/ASSET_OOS_ALL.csv` with `Date`, `True`, `HM`, `PER`, and the five model prediction columns.
-- `predictions/analysis/ASSET_ROLLING_ROS2_126.csv` and `ASSET_ROLLING_ROS2_252.csv` with the rolling series used by the figure script.
-- `predictions/robustness/analysis/WINDOW_ROBUSTNESS_LONG.csv`, `SEQLEN_ROBUSTNESS_LONG.csv`, and `RETUNE_ROBUSTNESS_LONG.csv` for robustness summaries.
+## Prediction input layout
 
-Use the asset and model identifiers listed in the root README. The scripts consume the provided inputs; the code-only package does not supply or verify their historical availability.
+- `final/ASSET/MODEL_predictions.csv`
+- `seed7/ASSET/MODEL_predictions.csv`
+- `seed2024/ASSET/MODEL_predictions.csv`
+- `budget60/ASSET/MODEL_predictions.csv`
+- `analysis/ASSET_OOS_ALL.csv`
+- `analysis/ASSET_ROLLING_ROS2_126.csv`
+- `analysis/ASSET_ROLLING_ROS2_252.csv`
+- `robustness/analysis/WINDOW_ROBUSTNESS_LONG.csv`
+- `robustness/analysis/SEQLEN_ROBUSTNESS_LONG.csv`
+- `robustness/analysis/RETUNE_ROBUSTNESS_LONG.csv`
+
+`ASSET_OOS_ALL.csv` contains `Date`, `True`, `HM`, `PER`, and the five model prediction columns. Use the asset and model identifiers listed in the main README.
 
 ## Commands
 
-From the code-package root, regenerate Tables 5--7 and the bandwidth sensitivity output:
-
-```bash
-python analysis/make_tables.py --results /path/to/results-archive/predictions --robustness /path/to/results-archive/predictions/robustness --out tables
-```
-
-Regenerate Tables 4, 8, and 9:
-
-```bash
-python analysis/make_supplementary_tables.py --predictions /path/to/results-archive/predictions --out tables
-```
-
-Regenerate Table 1 from separately acquired and prepared return files:
+Run from the repository root:
 
 ```bash
 python analysis/make_descriptive_stats.py --data /path/to/prepared/data --out tables
+python analysis/make_tables.py --results /path/to/predictions --robustness /path/to/predictions/robustness --out tables
+python analysis/make_supplementary_tables.py --predictions /path/to/predictions --out tables
+ANALYSIS_DIR=/path/to/predictions/analysis python analysis/make_figures.py
 ```
 
-The descriptive-statistics script includes the manuscript's reference values as validation constants; these are not a bundled dataset or a precomputed output file.
-
-Regenerate Figures 1--6 using externally supplied aggregates and rolling series:
-
-```bash
-ANALYSIS_DIR=/path/to/results-archive/predictions/analysis python analysis/make_figures.py
-```
-
-The figure script writes JPG files and bitmap PDF files to `figs/`. These formats reflect the existing implementation; the PDF output is not vector artwork.
-
-Tables 5 and 6 use aligned forecast aggregates. Tables 4, 8, and 9 use per-origin forecasts. Table 7 uses previously prepared robustness summaries and does not recompute those robustness experiments from raw data. The scripts do not provide a single command that rebuilds every input from the forecasting runner's output.
+The descriptive-statistics script computes values from the supplied returns. The table scripts read the specified forecasts and summaries; they do not retrain the models. The figure script writes JPG and bitmap PDF files to `figs/`.
