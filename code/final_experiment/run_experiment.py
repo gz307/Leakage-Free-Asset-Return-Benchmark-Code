@@ -2,11 +2,9 @@
 """
 Rolling-origin runner.
 
-The defaults reproduce the reported baseline exactly. Three optional arguments
-were added for the replication experiments; when they are omitted the behaviour
-is identical to the original runner.
+Generate one-step-ahead forecasts using a rolling estimation window.
 
-Baseline (unchanged):
+Baseline:
     python code/final_experiment/run_experiment.py --asset CSI300 --model LSTM --mode full
 
 Seed replication (results go to results/<tag>/):
@@ -66,7 +64,7 @@ MODEL_NAMES = ["LSTM", "Transformer", "Autoformer", "PatchTST", "iTransformer"]
 # ============================================================
 
 def suggest_params(trial, model_name):
-    """Same search space and same suggestion order as the original runner."""
+    """Sample hyperparameters for the selected architecture."""
 
     if model_name == "LSTM":
         return {
