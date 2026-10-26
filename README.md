@@ -105,7 +105,7 @@ The first-party experiment scripts are supplied for scholarly reproduction of th
 
 ## Analysis code and separately supplied results
 
-This repository contains source code and documentation only. Experimental outputs, market-data CSVs, saved predictions, metrics, manuscript tables and figures, model checkpoints, logs, and run manifests are not bundled. The external results archive is published separately under a new DOI; consult the final manuscript data-availability statement for its identifier. This repository does not reuse the earlier archive DOI.
+This repository contains source code and documentation only. Experimental outputs, market-data CSVs, saved predictions, metrics, manuscript tables and figures, model checkpoints, logs, and run manifests are not bundled. Experimental outputs are handled separately from this repository. The results archive requires a newly issued DOI; its identifier must be added to the manuscript data-availability statement once the new deposit is published. This repository does not reuse the earlier archive DOI.
 
 The `analysis/` directory contains the current table and figure scripts. Their input files must be supplied separately. With an external results archive available, run:
 
