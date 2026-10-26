@@ -1,0 +1,31 @@
+# Python and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Input data and experimental outputs
+data/*.csv
+data/*.parquet
+data/*.xlsx
+predictions/
+results/
+tables/
+figs/
+figures/
+checkpoints/
+logs/
+provenance/
+work/
+RUN_MANIFEST.json
+*.pt
+*.pth
+*.ckpt
+*.log
+*.zip
+
+# Local system files
+.DS_Store
+Thumbs.db
