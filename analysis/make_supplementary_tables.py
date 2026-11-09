@@ -1,4 +1,4 @@
-"""Rebuild Tables 4, 8, and 9 from archived per-origin forecasts."""
+"""Rebuild Tables 4, 9, and 9 from archived per-origin forecasts."""
 
 import argparse
 import json
@@ -33,7 +33,7 @@ def r2os(frame, model):
     return float(1.0 - np.square(y - pred).sum() / denom)
 
 
-def build_table8(root):
+def build_table9(root):
     rows = []
     for asset in ("CSI300", "BTCUSD"):
         base = {m: load_prediction(root, "final", asset, m) for m in MODELS}
@@ -58,7 +58,7 @@ def build_table8(root):
     return pd.DataFrame(rows)
 
 
-def build_table9(root):
+def build_table10(root):
     rows = []
     for asset in ASSETS:
         by_seed = {}
@@ -132,22 +132,22 @@ def main():
     args = parser.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    table8 = build_table8(args.predictions)
     table9 = build_table9(args.predictions)
+    table10 = build_table10(args.predictions)
     table4 = build_table4(args.predictions)
-    for name, frame in (("table8.csv", table8), ("table9.csv", table9), ("table4.csv", table4)):
+    for name, frame in (("table9.csv", table9), ("table10.csv", table10), ("table4.csv", table4)):
         frame.to_csv(out / name, index=False, float_format="%.12g")
         print(f"{name}: {len(frame)} rows -> {out / name}")
-    print(f"Table 8: all negative at 60 trials={bool((table8.R2OS_60 < 0).all())}; "
-          f"ordering unchanged in both assets={bool((table8.Rank_20 == table8.Rank_60).all())}; "
-          f"mean absolute change={table8.Delta_R2OS.abs().mean():.6f}; "
-          f"max absolute change={table8.Delta_R2OS.abs().max():.6f}")
+    print(f"Table 9: all negative at 60 trials={bool((table9.R2OS_60 < 0).all())}; "
+          f"ordering unchanged in both assets={bool((table9.Rank_20 == table9.Rank_60).all())}; "
+          f"mean absolute change={table9.Delta_R2OS.abs().mean():.6f}; "
+          f"max absolute change={table9.Delta_R2OS.abs().max():.6f}")
     seed_columns = ["R2OS_seed42", "R2OS_seed7", "R2OS_seed2024"]
-    stable_negative = int((table9[seed_columns] < 0).all(axis=1).sum())
+    stable_negative = int((table10[seed_columns] < 0).all(axis=1).sum())
     pooled_origins = sum(len(load_prediction(args.predictions, "final", a, m))
                          for a in ASSETS for m in MODELS)
-    print(f"Table 9: all-negative seed triplets={stable_negative}/20; "
-          f"mean SD={table9.SD.mean():.6f}")
+    print(f"Table 10: all-negative seed triplets={stable_negative}/20; "
+          f"mean SD={table10.SD.mean():.6f}")
     print(f"Table 4: selected configurations summarized over {pooled_origins} "
           "model-asset-origin records")
 
