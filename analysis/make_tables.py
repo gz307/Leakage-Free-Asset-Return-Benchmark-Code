@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-make_tables.py -- regenerate Table 5, Table 6 and Table 7 of the manuscript
+make_tables.py -- regenerate Table 5, Table 6 and Table 8 of the manuscript
 from archived out-of-sample forecast files.
 
 Usage
 -----
-    python make_tables.py --results results/final --out tables
+    python analysis/make_tables.py --results predictions --robustness predictions/robustness --out tables
 
 Inputs (must exist)
 -------------------
-    results/final/analysis/{ASSET}_OOS_ALL.csv
+    predictions/analysis/{ASSET}_OOS_ALL.csv
         columns: Date, True, HM, PER, LSTM, Transformer, Autoformer, PatchTST, iTransformer
-    results/robustness/analysis/WINDOW_ROBUSTNESS_LONG.csv
-    results/robustness/analysis/SEQLEN_ROBUSTNESS_LONG.csv
-    results/robustness/analysis/RETUNE_ROBUSTNESS_LONG.csv
+    predictions/robustness/analysis/WINDOW_ROBUSTNESS_LONG.csv
+    predictions/robustness/analysis/SEQLEN_ROBUSTNESS_LONG.csv
+    predictions/robustness/analysis/RETUNE_ROBUSTNESS_LONG.csv
 
 Outputs
 -------
     tables/table5.csv            point estimates (MSE, MAE, R2OS, DA, N)
     tables/table6.csv            predictive-accuracy tests vs HM and PER
-    tables/table6_bandwidth.csv Clark-West with lag 1 vs automatic bandwidth
-    tables/table7.csv            robustness of R2OS to W, L and the re-tuning interval
+    tables/table6_bandwidth.csv Clark-West and realized-loss comparisons with one vs automatic eight lags
+    tables/table8.csv            robustness of R2OS to W, L and the re-tuning interval
 
 Statistical conventions (must match the manuscript)
 ---------------------------------------------------
@@ -28,7 +28,7 @@ Statistical conventions (must match the manuscript)
 * R2OS = 1 - SSE(model) / SSE(HM); HM has R2OS = 0 by construction.
 * Newey-West (Bartlett) HAC variance.
   - Primary specification: one lag (as stated in Section 3.6 of the manuscript).
-  - Sensitivity: Newey-West (1994) automatic bandwidth
+  - Sensitivity: Sample-size-based automatic bandwidth
         floor(4 * (n/100)^(2/9)), bounded to [1, n-1].
 * Clark-West: f_t = e_HM,t^2 - e_m,t^2 + (HM_t - m_t)^2,
   one-sided upper-tail standard-normal p-value.
@@ -67,7 +67,7 @@ def nw_variance(x, lag):
 
 
 def auto_bandwidth(n):
-    """Newey-West (1994) plug-in bandwidth, bounded to [1, n-1]."""
+    """Sample-size-based bandwidth rule, bounded to [1, n-1]."""
     return int(max(1, min(math.floor(4.0 * (n / 100.0) ** (2.0 / 9.0)), n - 1)))
 
 
@@ -260,9 +260,9 @@ def build_table6(frames, lag=1):
 
 
 # ----------------------------------------------------------------------
-# Table 7
+# Table 8
 # ----------------------------------------------------------------------
-def build_table7(results_root):
+def build_table8(results_root):
     """results_root is the robustness results directory (…/results/robustness)."""
     anal = os.path.join(results_root, "analysis")
     out = []
@@ -350,12 +350,12 @@ def main():
 
     table5 = build_table5(frames)
     table6 = build_table6(frames)
-    table7 = build_table7(args.robustness)
+    table8 = build_table8(args.robustness)
 
     table5.to_csv(os.path.join(args.out, "table5.csv"), index=False, float_format="%.10f")
     table6.to_csv(os.path.join(args.out, "table6.csv"), index=False, float_format="%.12g")
     write_table6_tex(table6, os.path.join(args.out, "table6_body.tex"))
-    table7.to_csv(os.path.join(args.out, "table7.csv"), index=False, float_format="%.10f")
+    table8.to_csv(os.path.join(args.out, "table8.csv"), index=False, float_format="%.10f")
 
     bw = table6[["Asset", "Model", "CW_lag1", "p_CW_lag1", "p_CW_holm",
                  "CW_auto", "p_CW_auto", "p_CW_auto_holm", "dMSE_x1e4", "p_dMSE_lag1",
@@ -365,7 +365,7 @@ def main():
 
     print(f"Table 5: {len(table5)} rows -> {args.out}/table5.csv")
     print(f"Table 6: {len(table6)} rows -> {args.out}/table6.csv")
-    print(f"Table 7: {len(table7)} rows -> {args.out}/table7.csv")
+    print(f"Table 8: {len(table8)} rows -> {args.out}/table8.csv")
     print()
     print("Clark-West, Holm-adjusted, minimum p = "
           f"{table6['p_CW_holm'].min():.4f} "
