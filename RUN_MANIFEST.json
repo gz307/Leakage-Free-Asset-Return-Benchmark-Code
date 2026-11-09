@@ -1,0 +1,77 @@
+{
+  "manuscript": "Do deep time-series architectures beat naive baselines? A leakage-free out-of-sample benchmark on asset returns",
+  "journal": "PeerJ Computer Science",
+  "environment": {
+    "python": "3.10",
+    "pytorch": "2.1.2+cu118",
+    "cuda": "11.8",
+    "os": "Ubuntu 22.04",
+    "gpu": "1 x NVIDIA GeForce RTX 4090D (24 GB)",
+    "cpu": "15 vCPU Intel Xeon Platinum 8474C",
+    "memory": "80 GB",
+    "platform": "AutoDL container image (dependencies as listed in requirements.txt)"
+  },
+  "protocol": {
+    "window": 504,
+    "validation": 126,
+    "sequence_length": 60,
+    "horizon": 1,
+    "step": 1,
+    "retune_interval": 63,
+    "baseline_trials": 20,
+    "sensitivity_trials": 60,
+    "max_epochs": 50,
+    "early_stopping_patience": 10
+  },
+  "seeds": {
+    "baseline": 42,
+    "replication": [
+      7,
+      2024
+    ]
+  },
+  "runs": {
+    "baseline": {
+      "seed": 42,
+      "trials": 20,
+      "assets": 4,
+      "models": 5,
+      "forecast_origins": 13337,
+      "forecast_rows_across_models": 66685,
+      "forecast_origins_definition": "sum of distinct asset-origin dates across the four assets; forecast rows are reported separately across five models",
+      "forecast_files": 20
+    },
+    "seed_replication": {
+      "seeds": [
+        7,
+        2024
+      ],
+      "trials": 20,
+      "assets": 4,
+      "models": 5,
+      "forecast_origins": 26674,
+      "forecast_rows_across_models": 133370,
+      "forecast_origins_definition": "sum of distinct asset-origin dates across two additional seeds and four assets; forecast rows are reported separately across five models",
+      "forecast_files": 40
+    },
+    "budget_sensitivity": {
+      "seed": 42,
+      "trials": 60,
+      "assets": [
+        "CSI300",
+        "BTCUSD"
+      ],
+      "models": 5,
+      "forecast_origins": 7327,
+      "forecast_rows_across_models": 36635,
+      "forecast_origins_definition": "sum of distinct asset-origin dates across CSI300 and BTCUSD; forecast rows are reported separately across five models",
+      "forecast_files": 10
+    }
+  },
+  "replication_run_window_utc": "2026-10-19T07:14 to 2026-10-20T12:38",
+  "how_the_numbers_were_produced": "Tables 4–6 and 9–10 are regenerated from archived per-origin forecasts and analysis inputs; Table 8 is reconstructed from archived robustness summary files; Figures 1–6 use archived forecast aggregates and rolling-series files; Table 1 uses the four source-return CSVs included in data/ of the Zenodo archive; Table 7 is generated from the Table 6 bandwidth output.",
+  "raw_data": "The four prepared source-data CSV files are included in data/ of the Zenodo code-data-replication archive. See data/README.md.",
+  "analysis_archive": "The Zenodo collection contains the complete supplied forecasting code, third-party model implementations, analysis scripts, source data, and archived results corresponding to the manuscript.",
+  "trial_logs_existing_runs": "not archived; selected hyperparameters, validation losses, selected epochs, seeds and trial budgets are retained per forecast origin. The runner writes trial-level Optuna CSV logs for future runs.",
+  "analysis_provenance_document": "PROVENANCE.md"
+}
