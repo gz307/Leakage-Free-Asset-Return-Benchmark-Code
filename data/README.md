@@ -7,7 +7,7 @@ The four source-data CSV files are included in the data/ directory of the public
 | `CSI300_daily_data.csv` | CSI 300, Wind Financial Terminal | Unadjusted close | 2010-01-04 to 2026-07-17 |
 | `SP500_daily_data.csv` | `^GSPC`, Yahoo Finance | Adjusted close | 2010-01-04 to 2026-07-17 |
 | `CSI1000_daily_data.csv` | CSI 1000, Wind Financial Terminal | Unadjusted close | 2014-10-20 to 2026-07-17 |
-| `BTC_USD_daily_data.csv` | `btc`, Coin Metrics ReferenceRateUSD | Reference rate sampled at 00:00 UTC | 2014-09-18 to 2026-07-16 |
+| `BTC_USD_daily_data.csv` | `BTC-USD`, Yahoo Finance | Daily Close (UTC-dated) | 2014-09-18 to 2026-07-16 |
 
 The retrieval dates are listed in `DATA_MANIFEST.csv`; source links are listed below. The Zenodo archive already places the source-data CSVs in the data directory for Table 1 or retraining. When using the GitHub code package, copy those files into data/. There is no automated provider downloader. Users obtaining the original provider series independently should use the documented fields and sample periods under the applicable provider terms.
 
@@ -21,10 +21,14 @@ python analysis/make_descriptive_stats.py --data data --out tables
 
 The script writes `tables/table1.csv` and checks dates, counts, means, sample standard deviations, skewness, and Fisher excess kurtosis against the manuscript's printed values. The normal distribution has excess kurtosis zero. This script checks the stored `Log_Return` values against Table 1; it does not independently validate the provider's original export or retrieve the preceding source price.
 
-The full-sample return counts and out-of-sample counts follow the manuscript's convention: the first return uses the preceding observation from the relevant source series, and the out-of-sample count equals the full-sample count minus the initial 504-return window. The inferred preceding values and their verification limitation are recorded in `DATA_CONSTRUCTION_NOTES.md`. BTC/USD uses the Coin Metrics reference-rate timestamp at 00:00 UTC; it is not an exchange closing price.
+The full-sample return counts and out-of-sample counts follow the manuscript's convention: the first return uses the preceding observation from the relevant source series, and the out-of-sample count equals the full-sample count minus the initial 504-return window. The inferred preceding values and their verification limitation are recorded in `DATA_CONSTRUCTION_NOTES.md`. BTC/USD uses Yahoo Finance BTC-USD daily OHLCV records dated in UTC. Log_Return is calculated from consecutive daily Close values.
 
 ## Provider references
 
 - CSI 300 and CSI 1000: [Wind Financial Terminal](https://www.wind.com.cn/portal/zh/WFT/index.html)
 - S&P 500, ticker `^GSPC`: [Yahoo Finance historical data](https://finance.yahoo.com/quote/%5EGSPC/history/)
-- BTC/USD: [Coin Metrics Reference Rates](https://docs.coinmetrics.io/market-data/reference-rates-overview/reference_rate)
+- BTC/USD: [Yahoo Finance BTC-USD historical data](https://finance.yahoo.com/quote/BTC-USD/history/)
+
+## S&P 500 data correction
+
+The revised replication package corrects the 3 July 2023 S&P 500 Open to 4450.48, as reported by Yahoo Finance for ^GSPC. It preserves all other fields, including the complete Log_Return column. The forecast code reads Log_Return.
